@@ -75,18 +75,17 @@ class Obstructions:
         ]
         while amount > 0:
             rand_func = random.choice(funcs)
-            if all(
-                point not in self.all_obstructions
-                and all(point != [part[0], part[1]] for part in all_parts)
-                for point in rand_func()
-            ):
-                self.all_obstructions.extend(list(point for point in rand_func()))
-                amount -= len(rand_func())
+            points = []
+            for point in rand_func():
+                points.append(point)
+            if all(point not in self.all_obstructions for point in points) and all(point != [part[0], part[1]] for part in all_parts for point in points):
+                self.all_obstructions.extend(points)
+                amount -= 1
             if len(self.all_obstructions) == (self.size_of_field[0] + 1) * (
                 self.size_of_field[1] + 1
             ) - len(all_parts):
                 print(
-                    f"Too much obstructions, was built only {len(self.all_obstructions)}"
+                    f"Too much obstructions, was not built {amount}"
                 )
                 print(self.all_obstructions)
                 return sorted(self.all_obstructions)
