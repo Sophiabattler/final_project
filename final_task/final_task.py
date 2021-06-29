@@ -19,7 +19,7 @@ class Field:
         length = 10 if input_length == "" else int(input_length)
         width = 10 if input_width == "" else int(input_width)
         size_of_field = (length, width)
-        print("Counting starts from zero")
+        print(f"\u001b[0;33mCounting starts from zero\u001b[0m")
         print(f"{length}x{width}")
         return size_of_field
 
@@ -86,11 +86,11 @@ class Obstructions:
             if len(self.all_obstructions) == (self.size_of_field[0] + 1) * (
                 self.size_of_field[1] + 1
             ) - len(all_parts):
-                print(f"Too much obstructions, was not built {amount}")
-                print(self.all_obstructions)
-                return sorted(self.all_obstructions)
-        print(self.all_obstructions)
-        return sorted(self.all_obstructions)
+                print(f"\u001b[0;33mToo much obstructions, was not built {amount}\u001b[0m")
+                print(f"\u001b[0;30;45m{self.all_obstructions}\u001b[0m")
+                return self.all_obstructions
+        print(f"\u001b[0;30;45m{self.all_obstructions}\u001b[0m")
+        return self.all_obstructions
 
 
 def _coord(func) -> Callable:
@@ -113,9 +113,9 @@ def _coord(func) -> Callable:
             parts.append(coord)
             coord = []
         self.path[self.i] = parts
-        print(f"Current position:{self.all_parts}")
+        print(f"\u001b[0;30;42mCurrent position:{self.all_parts}\u001b[0m")
         if len(self.path) > 1:
-            print(f"Last position:{self.path[self.i - 1]}")
+            print(f"\u001b[0;33mLast position:{self.path[self.i - 1]}\u001b[0m")
 
     return wrapper
 
@@ -128,8 +128,10 @@ class Robot:
     def __init__(self):
         self.path = {}
         self.coordinates = []
-        self.i = 0
         self.all_parts = []
+        self.i = 0
+        self.vision_range = 4
+        self.max_len = 0
 
     def choose_shape_of_robot(self, field_size: Tuple):
         """Takes size of the field and allows user to choose
@@ -144,7 +146,7 @@ class Robot:
                 return self.line_robot(field_size)
             if input_shape == "cross":
                 return self.cross_robot(field_size)
-            print("Wrong shape, try again")
+            print(f"\u001b[0;30;43mWrong shape, try again\u001b[0m")
             return self.choose_shape_of_robot(field_size)
         if field_size[0] < 2 and field_size[1] > 1:
             input_shape = input(
@@ -154,13 +156,13 @@ class Robot:
                 return self.dot_robot(field_size)
             if input_shape == "line":
                 return self.line_robot(field_size)
-            print("Wrong shape, try again")
+            print(f"\u001b[0;30;43mWrong shape, try again\u001b[0m")
             return self.choose_shape_of_robot(field_size)
         if field_size[0] < 2 and field_size[1] < 1:
             input_shape = input("Please input shape of the robot(available: dot):")
             if input_shape == "dot":
                 return self.dot_robot(field_size)
-            print("Wrong shape, try again")
+            print(f"\u001b[0;30;43mWrong shape, try again\u001b[0m")
             return self.choose_shape_of_robot(field_size)
 
     @_coord
@@ -247,10 +249,10 @@ class Robot:
         if any(
             [part[0] + i, part[1] + j] in all_obstructions for part in self.all_parts
         ):
-            print("You can't move here, there is an obstruction")
+            print(f"\u001b[0;30;41mYou can't move here, there is an obstruction\u001b[0m")
             return self
         elif condition:
-            print("You can't move here, there is an edge of the field")
+            print(f"\u001b[0;30;41mYou can't move here, there is an edge of the field\u001b[0m")
             return self
         else:
             return func_turn()
@@ -259,6 +261,38 @@ class Robot:
         """Save path of the robot in json-file"""
         with open("path.json", "w", encoding="utf-8") as file:
             json.dump(self.path, file, ensure_ascii=False)
+
+    def max_size_of_robot(self):
+        """Looking for the maximum size of the robot"""
+        high = []
+        width = []
+        for part in self.all_parts:
+            width.append(part[0])
+            high.append(part[1])
+        len_high = max(high) - min(high) + 1
+        len_width = max(width) - min(width) + 1
+        self.max_len = max(len_width, len_high)
+
+    def print_matrix(self, all_obstructions: List):
+        """Print picture of еру robot in in a user-defined range"""
+        input_vision_range = input("Please input vision range:")
+        if not input_vision_range.isdigit():
+            return self.print_matrix(all_obstructions)
+        self.vision_range = int(input_vision_range)
+        matrix_for_print = [[' ' for _ in range(self.vision_range + self.max_len)] for _ in range(self.vision_range + self.max_len)]
+        middle = int(len(matrix_for_print)/2), int(len(matrix_for_print)/2)
+        matrix_for_print[int(len(matrix_for_print)/2)][int(len(matrix_for_print)/2)] = self.coordinates[2]
+        shift_x = self.coordinates[0] - middle[0]
+        shift_y = self.coordinates[1] - middle[1]
+        for part in self.all_parts:
+            if part != self.coordinates:
+                matrix_for_print[part[0] - shift_x][part[1] - shift_y] = 'x'
+        for obstruction in all_obstructions:
+            if obstruction[0] - shift_x in range(self.vision_range + self.max_len) and obstruction[1] - shift_y in range(self.vision_range + self.max_len):
+                matrix_for_print[obstruction[0] - shift_x][obstruction[1] - shift_y] = 'z'
+        for i in matrix_for_print:
+            new_string = "  ".join(value.strip('"') for value in i)
+            print(f"\u001b[0;37;44m{new_string}\u001b[0m")
 
     def movement(self, all_obstructions, field_size):
         """Takes size of the field and coordinates of obstructions.
@@ -272,6 +306,7 @@ class Robot:
         l - turn-left (90 degrees)
         u - u-turn (180 degrees)
         p - keep path of the robot to json-file
+        i - make an image of robot and surroundings (with curtain R)
         esc - program exit
         """
         print('To exit press "esc"')
@@ -310,6 +345,10 @@ class Robot:
 
             if pressed_key == "p":
                 self.save_path()
+
+            if pressed_key == "i":
+                self.max_size_of_robot()
+                self.print_matrix(all_obstructions)
 
             if pressed_key == "r":
                 # turn right
@@ -400,4 +439,6 @@ if __name__ == "__main__":
     start_robot = robot.choose_shape_of_robot(size)
     obstructions = Obstructions(size)
     built = obstructions.build(robot.all_parts)
+    # robot.max_size_of_robot()
+    # robot.print_matrix(obstructions.all_obstructions)
     move = robot.movement(obstructions.all_obstructions, size)
