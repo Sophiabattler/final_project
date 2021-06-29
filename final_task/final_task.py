@@ -86,7 +86,9 @@ class Obstructions:
             if len(self.all_obstructions) == (self.size_of_field[0] + 1) * (
                 self.size_of_field[1] + 1
             ) - len(all_parts):
-                print(f"\u001b[0;33mToo much obstructions, was not built {amount}\u001b[0m")
+                print(
+                    f"\u001b[0;33mToo much obstructions, was not built {amount}\u001b[0m"
+                )
                 print(f"\u001b[0;30;45m{self.all_obstructions}\u001b[0m")
                 return self.all_obstructions
         print(f"\u001b[0;30;45m{self.all_obstructions}\u001b[0m")
@@ -249,10 +251,14 @@ class Robot:
         if any(
             [part[0] + i, part[1] + j] in all_obstructions for part in self.all_parts
         ):
-            print(f"\u001b[0;30;41mYou can't move here, there is an obstruction\u001b[0m")
+            print(
+                f"\u001b[0;30;41mYou can't move here, there is an obstruction\u001b[0m"
+            )
             return self
         elif condition:
-            print(f"\u001b[0;30;41mYou can't move here, there is an edge of the field\u001b[0m")
+            print(
+                f"\u001b[0;30;41mYou can't move here, there is an edge of the field\u001b[0m"
+            )
             return self
         else:
             return func_turn()
@@ -279,17 +285,26 @@ class Robot:
         if not input_vision_range.isdigit():
             return self.print_matrix(all_obstructions)
         self.vision_range = int(input_vision_range)
-        matrix_for_print = [[' ' for _ in range(self.vision_range + self.max_len)] for _ in range(self.vision_range + self.max_len)]
-        middle = int(len(matrix_for_print)/2), int(len(matrix_for_print)/2)
-        matrix_for_print[int(len(matrix_for_print)/2)][int(len(matrix_for_print)/2)] = self.coordinates[2]
+        matrix_for_print = [
+            [" " for _ in range(self.vision_range + self.max_len)]
+            for _ in range(self.vision_range + self.max_len)
+        ]
+        middle = int(len(matrix_for_print) / 2), int(len(matrix_for_print) / 2)
+        matrix_for_print[int(len(matrix_for_print) / 2)][
+            int(len(matrix_for_print) / 2)
+        ] = self.coordinates[2]
         shift_x = self.coordinates[0] - middle[0]
         shift_y = self.coordinates[1] - middle[1]
         for part in self.all_parts:
             if part != self.coordinates:
-                matrix_for_print[part[0] - shift_x][part[1] - shift_y] = 'x'
+                matrix_for_print[part[0] - shift_x][part[1] - shift_y] = "x"
         for obstruction in all_obstructions:
-            if obstruction[0] - shift_x in range(self.vision_range + self.max_len) and obstruction[1] - shift_y in range(self.vision_range + self.max_len):
-                matrix_for_print[obstruction[0] - shift_x][obstruction[1] - shift_y] = 'z'
+            if obstruction[0] - shift_x in range(
+                self.vision_range + self.max_len
+            ) and obstruction[1] - shift_y in range(self.vision_range + self.max_len):
+                matrix_for_print[obstruction[0] - shift_x][
+                    obstruction[1] - shift_y
+                ] = "z"
         for i in matrix_for_print:
             new_string = "  ".join(value.strip('"') for value in i)
             print(f"\u001b[0;37;44m{new_string}\u001b[0m")
