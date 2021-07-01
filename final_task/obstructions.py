@@ -1,6 +1,9 @@
 """Class for creating obstructions"""
+import os
 import random
 from typing import List, Tuple
+
+os.system("")
 
 
 class Obstructions:

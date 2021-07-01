@@ -1,10 +1,13 @@
 """Class for manipulation with robot"""
 import json
+import os
 import time
 from functools import wraps
 from typing import Callable, List, Tuple
 
 import keyboard
+
+os.system("")
 
 
 def _coord(func) -> Callable:
@@ -195,18 +198,16 @@ class Robot:
                 matrix_for_print[-1 - (part[1] - shift_y)][part[0] - shift_x] = "x"
 
         for obstruction in all_obstructions:
-            if obstruction[0] - shift_x in range(
-                self.vision_range + self.max_len
-            ) and -1 - (obstruction[1] - shift_y) in range(
-                -(size - 1), 0
-            ):  # TODO
+            if obstruction[0] - shift_x in range(size) and -1 - (
+                obstruction[1] - shift_y
+            ) in range(-size, 0):
                 matrix_for_print[size - 1 - (obstruction[1] - shift_y)][
                     obstruction[0] - shift_x
                 ] = "z"
 
         for i in matrix_for_print:
-            new_string = "  ".join(value.strip('"') for value in i)
-            print(f"\u001b[0;37;44m{new_string}\u001b[0m")
+            new_string = " ".join(value.strip('"') for value in i)
+            print(f"\u001b[0m{new_string}\u001b[0m")
 
     def movement(self, all_obstructions: List, field_size: Tuple):
         """Takes size of the field and coordinates of obstructions.

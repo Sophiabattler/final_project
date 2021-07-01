@@ -1,5 +1,8 @@
 """Class for creating field"""
+import os
 from typing import Tuple
+
+os.system("")
 
 
 class Field:
