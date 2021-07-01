@@ -4,6 +4,7 @@ from unittest import mock
 from unittest.mock import patch
 
 import keyboard
+
 from final_task.field import Field
 from final_task.obstructions import Obstructions
 from final_task.robot import Robot
