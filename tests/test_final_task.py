@@ -3,6 +3,8 @@ import builtins
 from unittest import mock
 from unittest.mock import patch
 
+import keyboard
+
 from final_task.field import Field
 from final_task.obstructions import Obstructions
 from final_task.robot import Robot
@@ -77,8 +79,9 @@ def test_building_obstructions_different_shapes_when_not_too_much_obstructions()
             assert [size[0], size[1]] >= obstruction >= [0, 0]
 
 
-@patch.object(builtins, "input", side_effect=["line", "d", "esc"])
-def test_robot_can_not_move_if_an_obstruction(test_input):
+@patch.object(builtins, "input", side_effect=["line"])
+@patch.object(keyboard, "read_key", side_effect=["d", "esc"])
+def test_robot_can_not_move_if_an_obstruction(test_input_shape, test_keyboard):
     size = (4, 4)
     robot = Robot()
     all_obstructions = [[3, 3], [3, 4], [4, 3], [4, 4]]
@@ -88,8 +91,11 @@ def test_robot_can_not_move_if_an_obstruction(test_input):
     assert robot.all_parts == [[2, 3], [2, 2, "↑"], [2, 1]]
 
 
-@patch.object(builtins, "input", side_effect=["line", "u", "esc"])
-def test_robot_does_u_turn_and_move_if_there_is_not_an_obstruction(test_input):
+@patch.object(builtins, "input", side_effect=["line"])
+@patch.object(keyboard, "read_key", side_effect=["u", "esc"])
+def test_robot_does_u_turn_and_move_if_there_is_not_an_obstruction(
+    test_input_shape, test_keyboard
+):
     size = (4, 4)
     robot = Robot()
     all_obstructions = [[3, 3], [3, 4], [4, 3], [4, 4]]
@@ -99,8 +105,9 @@ def test_robot_does_u_turn_and_move_if_there_is_not_an_obstruction(test_input):
     assert robot.all_parts == [[2, 3], [2, 2, "↓"], [2, 1]]
 
 
-@patch.object(builtins, "input", side_effect=["line", "s", "d", "esc"])
-def test_robot_remembers_its_path(test_input):
+@patch.object(builtins, "input", side_effect=["line"])
+@patch.object(keyboard, "read_key", side_effect=["s", "d", "esc"])
+def test_robot_remembers_its_path(test_input_shape, test_keyboard):
     size = (4, 4)
     robot = Robot()
     all_obstructions = [[3, 3], [3, 4], [4, 3], [4, 4]]
@@ -114,8 +121,9 @@ def test_robot_remembers_its_path(test_input):
     }
 
 
-@patch.object(builtins, "input", side_effect=["dot", "s", "s", "s", "esc"])
-def test_robot_can_not_move_outside_the_field(test_input):
+@patch.object(builtins, "input", side_effect=["dot"])
+@patch.object(keyboard, "read_key", side_effect=["s", "s", "s", "esc"])
+def test_robot_can_not_move_outside_the_field(test_input_shape, test_keyboard):
     size = (1, 1)
     robot = Robot()
     all_obstructions = []
