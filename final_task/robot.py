@@ -5,8 +5,6 @@ import time
 from functools import wraps
 from typing import Callable, List, Tuple
 
-import keyboard
-
 os.system("")
 
 
@@ -239,7 +237,7 @@ class Robot:
         )
         pressed_key = ""
         while pressed_key != "esc":
-            pressed_key = keyboard.read_key()
+            pressed_key = input("Input command:")
             time.sleep(0.5)
             right_for_up = (
                 1,
